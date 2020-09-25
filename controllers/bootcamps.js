@@ -13,7 +13,7 @@ exports.getBootcamp = (req, res, next) => {
 };
 //routing                   /api/v1/bootcamps
 //method                     POST
-// access                          private
+// access                    private
 
 exports.createBootcamps = (req, res, next) => {
   res.status(200).json({ success: true, msg: 'create bootcamps' });
