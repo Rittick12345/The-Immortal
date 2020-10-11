@@ -61,6 +61,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   }
   res.status(200).json({ success: true, count: bootcamps.length, pagination, data: bootcamps });
 });
+
 //routing                   /api/v1/bootcamp/:id
 //method                     GET
 //access                     public
