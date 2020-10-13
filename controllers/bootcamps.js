@@ -20,7 +20,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   let queryStr = JSON.stringify(reqQuery);
   queryStr = queryStr.replace(/\b(gt|lt|gte|lte|in)\b/g, (match) => `$${match}`);
 
-  query = Bootcamp.find(JSON.parse(queryStr));
+  query = Bootcamp.find(JSON.parse(queryStr)).populate('courses');
 
   //selecting certain fields
   if (req.query.select) {
@@ -66,7 +66,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
 //method                     GET
 //access                     public
 exports.getBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findById(req.params.id);
+  const bootcamp = await Bootcamp.findById(req.params.id).populate('courses');
   if (!bootcamp) {
     return next(new ErrorResponse(`bootcamp not not be found with the id ${req.params.id}`, 404));
   }
@@ -100,15 +100,17 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
   });
 });
 
-//routing                   /api/v1/bootcamps
+//routing                   /api/v1/bootcamps/:id
 //method                     DELETE
 //access                     private
 
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+  console.log(req.params.id);
+  const bootcamp = await Bootcamp.findById(req.params.id);
   if (!bootcamp) {
     return next(new ErrorResponse(`bootcamp not found with id ${req.params.id}`, 404));
   }
+  bootcamp.remove();
   res.status(200).json({
     success: true,
     data: {},

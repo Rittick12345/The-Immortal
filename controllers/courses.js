@@ -11,14 +11,17 @@ const Bootcamp = require('../models/Bootcamp');
 exports.getCourses = asyncHandler(async (req, res, next) => {
   let query;
   if (req.params.bootcampId) {
-    query = Course.find({ bootcamp: req.params.bootcampId });
+    query = Course.find({ bootcamp: req.params.bootcampId }).populate('bootcamp');
     if (!query) {
       return next(
         new ErrorResponse(`The bootcamp id ${req.params.bootcampId} does not exists`, 400)
       );
     }
   } else {
-    query = Course.find({});
+    query = Course.find({}).populate({
+      path: 'bootcamp',
+      select: 'name description',
+    });
   }
   let courses = await query;
   res.status(200).json({ success: true, count: courses.length, data: courses });
