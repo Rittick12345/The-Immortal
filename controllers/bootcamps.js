@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const path = require('path');
 const Bootcamp = require('../models/Bootcamp');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
@@ -139,4 +140,33 @@ exports.getBootcampByRadius = asyncHandler(async (req, res, next) => {
     count: bootcamps.length,
     data: bootcamps,
   });
+});
+
+//routing                   /api/v1/bootcamps/:id/photo
+//method                     PUT
+//access                     private
+
+exports.bootcampUploadPhoto = asyncHandler(async (req, res, next) => {
+  const bootcamp = await Bootcamp.findById(req.params.id);
+  if (!bootcamp) {
+    return next(new ErrorResponse(`bootcamp not found with id ${req.params.id}`, 404));
+  }
+  console.log(req.files);
+  const file = req.files.file;
+  if (!file.mimetype.startsWith('image')) {
+    return next(new ErrorResponse(`Please upload an image file`, 400));
+  }
+
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(new ErrorResponse(`Max limit of photo is ${process.env.MAX_FILE_UPLOAD}`, 400));
+  }
+  file.name = `image_${req.params.id}${path.parse(file.name).ext}`;
+
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      return next(new ErrorResponse(`Internal server problem`, 500));
+    }
+    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+  });
+  res.status(200).json({ success: true, image: file.name });
 });
