@@ -6,5 +6,10 @@ const asyncHandler = require('../middleware/async');
 //method                     POST
 //access                     public
 exports.register = asyncHandler(async (req, res, next) => {
-  res.status(200).json({ success: true });
+  const { name, email, password, role } = req.body;
+
+  const user = await User.create({ name, password, email, role });
+  const token = user.getSignedJwtToken(); //as we using methods, so it is on instance
+
+  res.status(200).json({ success: true, token });
 });
