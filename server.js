@@ -4,10 +4,14 @@ const morgan = require('morgan');
 const colors = require('colors');
 const path = require('path');
 const fileUpload = require('express-fileupload');
-const bootcampRouter = require('./routes/bootcamps');
-const courseRouter = require('./routes/courses');
+
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
+
+//routes file
+const bootcampRouter = require('./routes/bootcamps');
+const courseRouter = require('./routes/courses');
+const auth = require('./routes/auth');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -25,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 app.use('/api/v1/bootcamps', bootcampRouter);
 app.use('/api/v1/courses', courseRouter);
+app.use('/api/v1/auth', auth);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
