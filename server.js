@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const colors = require('colors');
 const path = require('path');
 const fileUpload = require('express-fileupload');
+const cookieParser = require('cookie-parser');
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
@@ -19,8 +20,14 @@ connectDB();
 
 const app = express();
 
+//body parser middleware
 app.use(express.json());
+
+//cookie parser middleware
+app.use(cookieParser());
+
 if (process.env.NODE_ENV === 'development') {
+  //setting the morgan middleware
   app.use(morgan('dev'));
 }
 

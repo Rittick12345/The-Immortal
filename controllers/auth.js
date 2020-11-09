@@ -9,9 +9,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   const { name, email, password, role } = req.body;
 
   const user = await User.create({ name, password, email, role });
-  const token = user.getSignedJwtToken(); //as we using methods, so it is on instance
-
-  res.status(200).json({ success: true, token });
+  getTokenResponse(user, 200, res);
 });
 
 //routing                   /api/v1/auth/login
@@ -37,7 +35,20 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
-  const token = user.getSignedJwtToken(); //as we using methods, so it is on instance
+  getTokenResponse(user, 200, res);
+});
 
-  res.status(200).json({ success: true, token });
+//sending the token and setting the cookie from a middleware function
+const getTokenResponse = asyncHandler((user, statuscode, res) => {
+  //creating the token
+  const token = user.getSignedJwtToken();
+
+  const option = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 3600 * 1000),
+    httpOnly: true,
+  };
+  if ((process.env.NODE_ENV = 'production')) {
+    option.secure = true;
+  }
+  res.status(statuscode).cookie('token', token, option).json({ success: true, token });
 });
