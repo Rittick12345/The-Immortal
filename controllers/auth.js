@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const { protect } = require('../middleware/auth');
 
 //routing                   /api/v1/auth/register
 //method                     POST
@@ -51,4 +52,13 @@ const getTokenResponse = asyncHandler((user, statuscode, res) => {
     option.secure = true;
   }
   res.status(statuscode).cookie('token', token, option).json({ success: true, token });
+});
+
+//routing                   /api/v1/auth/me
+//method                     GET
+//access                     private
+
+exports.getMe = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  res.status(200).json({ data: user });
 });
