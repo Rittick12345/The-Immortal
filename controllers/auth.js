@@ -107,6 +107,42 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
   getTokenResponse(user, 200, res);
 });
 
+//routing                   /api/v1/auth/updatedetails
+//method                     PUT
+//access                     private
+
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+  const fieldToUpdate = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+
+  const user = await User.findByIdAndUpdate(req.user.id, fieldToUpdate, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({ success: true, data: user });
+});
+
+/*//routing                   /api/v1/auth/updatepassword
+//method                     PUT
+//access                     private
+
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+  const fieldToUpdate = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+
+  const user = await User.findByIdAndUpdate(req.user.id, fieldToUpdate, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({ success: true, data: user });
+});*/
+
 //sending the token and setting the cookie from a middleware function
 const getTokenResponse = asyncHandler((user, statuscode, res) => {
   //creating the token
